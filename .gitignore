@@ -1,0 +1,5 @@
+.vscode/
+ghcnd_all/
+ghcnd-version.txt
+*.json
+*.dly
