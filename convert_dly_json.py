@@ -21,16 +21,12 @@ days = {}
 
 def addMeasurement(dayStr, measureType, measurement):
         day = str(dayStr)
-        # dailyMeasurements.addMeasurement(measureType.strip(), measurement[0:5].strip(), measurement[5:6].strip(), measurement[6:7].strip(), measurement[7:8].strip())
         return [measureType.strip(), measurement[0:5].strip(), measurement[5:6].strip(), measurement[6:7].strip(), measurement[7:8].strip()]
-        # print dayStr
-        # self.days[day] = dailyMeasurements
 
 def readRow(lineOfData):
     rowData = {}
     rowData["countryCode"] = lineOfData[0:2]
     rowData["stationID"] = lineOfData[0:11]
-    # rowData["stationMonthCode"] = lineOfData[0:17]
     rowData["year"] = lineOfData[11:15]
     rowData["month"] = lineOfData[15:17]
     year = rowData["year"]
