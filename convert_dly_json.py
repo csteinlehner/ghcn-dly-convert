@@ -19,8 +19,7 @@ else:
 csvfile = sys.argv[1]
 days = {}
 
-def addMeasurement(dayStr, measureType, measurement):
-        day = str(dayStr)
+def addMeasurement(measureType, measurement):
         return [measureType.strip(), measurement[0:5].strip(), measurement[5:6].strip(), measurement[6:7].strip(), measurement[7:8].strip()]
 
 def readRow(lineOfData):
@@ -34,25 +33,22 @@ def readRow(lineOfData):
     days["stationID"] = rowData["stationID"]
     days["countryCode"] = rowData["countryCode"]
 
-    if days.has_key(year)==False:
-        days[year] = {}
-    if days[year].has_key(month)==False:
-        days[year][month] = {}
+    yearStr = 'y'+str(year);
+    monthStr ='m'+str(month); 
+    if days.has_key(yearStr)==False:
+        days[yearStr] = {}
+    if days[yearStr].has_key(monthStr)==False:
+        days[yearStr][monthStr] = {}
     element = lineOfData[17:21]
     for x in range(0, 31):
         dayOM = x + 1
         offsetStart = (x*8)+21
         offsetEnd = offsetStart + 8
-        dayDat = addMeasurement(dayOM, element, lineOfData[offsetStart:offsetEnd])
-        day = str("%02d" % (dayOM,))
-        if days[year][month].has_key(day)==False:
-            days[year][month][day] = {}
-        days[year][month][day][dayDat[0]] = int(dayDat[1])
-        # days[year][month][day]["stationID"] = rowData["stationID"]
-        # days[year][month][day]["countryCode"] = rowData["countryCode"]
-        # days[year][month][day]["year"] = int(rowData["year"])
-        # days[year][month][day]["month"] = int(rowData["month"])
-        # days[year][month][day]["day"] = dayOM
+        dayDat = addMeasurement(element, lineOfData[offsetStart:offsetEnd])
+        day = 'd'+str("%02d" % (dayOM,))
+        if days[yearStr][monthStr].has_key(day)==False:
+            days[yearStr][monthStr][day] = {}
+        days[yearStr][monthStr][day][dayDat[0]] = int(dayDat[1])
     return rowData
 
 
@@ -64,6 +60,7 @@ with open(csvfile) as fp:
 
 output = csvfile.split('.')[0]
 with open(output+'.json', 'w') as f:
-    json.dump(days, f, indent=2, sort_keys=True)
+    # json.dump(days, f, indent=2, sort_keys=True)
+    json.dump(days, f, sort_keys=True)
     print 'Json written to '+output+'.json'
 
