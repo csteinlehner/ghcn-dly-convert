@@ -1,11 +1,8 @@
-# 
-# 
-# Converts GHCN DLY Data from ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/ to JSON file structured by Year/Month/Day
-# Usage python convert_to_json.py stationname.dly
-#
-#
+""" 
+Converts GHCN DLY Data from ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/ to JSON file structured by Year/Month/Day
+Usage python convert_to_json.py stationname.dly
+""" 
 
-import csv
 import sys
 import json
 if len(sys.argv) > 1:
@@ -57,19 +54,10 @@ def readRow(lineOfData):
         # Check if this day already in currentMonth, if not add day and empty data 
         if not any(d['day'] == dayStr for d in days['years'][currentYearPos]['months'][currentMonthPos]['days']):
             days['years'][currentYearPos]['months'][currentMonthPos]['days'].append({'day': dayStr, 'data':[]})
-
+        # Searches for the right day and appends the current value
         for d in days['years'][currentYearPos]['months'][currentMonthPos]['days']:
             if (d['day'] == dayStr ):
                 d['data'].append({dayDat[0] : int(dayDat[1])})
-       
-        # dayPos = days['years'][currentYearPos]['months'][currentMonthPos]['days'].index(dayOM)
-        # print days['years'][currentYearPos]['months'][currentMonthPos]['days']
-        # days['years'][currentYearPos]['months'][currentMonthPos]['days'][dayStr]
-        # days[yearStr][monthStr][day][dayDat[0]] = int(dayDat[1])
-    return rowData
-
-
-
 
 with open(csvfile) as fp:
     for cnt, line in enumerate(fp):
@@ -77,7 +65,7 @@ with open(csvfile) as fp:
 
 output = csvfile.split('.')[0]
 with open(output+'.json', 'w') as f:
-    json.dump(days, f, indent=2, sort_keys=True)
-    # json.dump(days, f, sort_keys=True)
+    json.dump(days, f, indent=2, sort_keys=True) # readable version
+    # json.dump(days, f, sort_keys=True) # tiny version
     print 'Json written to '+output+'.json'
 
