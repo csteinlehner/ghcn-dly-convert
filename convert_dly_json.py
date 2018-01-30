@@ -7,37 +7,35 @@ import sys
 import json
 from calendar import monthrange
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 2:
     if sys.argv[1].find('.dly')==-1:
-        print "Please specify a .dly station file"
+        print "Please specify a .dly station file and a year Range as YYYY-YYYY"
         quit()
 else:
-    print "Please specify a .dly station file"
+    print "Please specify a .dly station file and a year Range as YYYY-YYYY"
     quit()
 
 csvfile = sys.argv[1]
+yearInput = map(int, sys.argv[2].split('-'))
+yearInputRange = range(yearInput[0],yearInput[1]+1)
+
 days = {}
 days["years"] = []
+rowData = {}
 
 
 def addMeasurement(measureType, measurement):
         return [measureType.strip(), measurement[0:5].strip(), measurement[5:6].strip(), measurement[6:7].strip(), measurement[7:8].strip()]
 
-def readRow(lineOfData):
-    rowData = {}
-    rowData["countryCode"] = lineOfData[0:2]
-    rowData["stationID"] = lineOfData[0:11]
-    rowData["year"] = lineOfData[11:15]
-    rowData["month"] = lineOfData[15:17]
+def addYear(lineOfData):
     year = rowData["year"]
     month = rowData["month"]
-    days["stationID"] = rowData["stationID"]
-    days["countryCode"] = rowData["countryCode"]
-
     yearStr = str(year);
     monthStr = str(month);
     currentYearPos = -1
     currentMonthPos = -1
+    
+
     # Check if this year already in days, if not add it with empty month array
     if not any(d["key"] == yearStr for d in days['years']):
         days["years"].append({'key': yearStr, 'months':[]})
@@ -63,13 +61,28 @@ def readRow(lineOfData):
                 # d['values'].append({dayDat[0] : int(dayDat[1])})
                 d['values'][dayDat[0]] = int(dayDat[1])
 
+def initDays():
+    days["stationID"] = rowData["stationID"]
+    days["countryCode"] = rowData["countryCode"]
+
+def readRow(lineOfData):
+    rowData["countryCode"] = lineOfData[0:2]
+    rowData["stationID"] = lineOfData[0:11]
+    rowData["year"] = lineOfData[11:15]
+    rowData["month"] = lineOfData[15:17]
+    year = int(rowData["year"])
+
+    initDays()
+    if year in yearInputRange:
+        addYear(lineOfData)
+
 with open(csvfile) as fp:
     for cnt, line in enumerate(fp):
        readRow(line)
 
 output = csvfile.split('.')[0]
 with open(output+'.json', 'w') as f:
-    # json.dump(days, f, indent=2, sort_keys=True) # readable version
-    json.dump(days, f, sort_keys=True) # tiny version
+    json.dump(days, f, indent=2, sort_keys=True) # readable version
+    # json.dump(days, f, sort_keys=True) # tiny version
     print 'Json written to '+output+'.json'
 
