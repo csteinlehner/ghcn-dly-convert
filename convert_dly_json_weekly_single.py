@@ -30,7 +30,7 @@ valKey = sys.argv[2]
 weeksprcp = {}
 weeksprcp["years"] = []
 rowData = {}
-weeks = {}
+weeks = []
 
 
 def addMeasurement(measureType, measurement):
@@ -50,7 +50,7 @@ def addToYear(lineOfData):
     if not any(d["key"] == yearStr for d in weeksprcp['years']):
         weeksprcp["years"].append({'key': yearStr, 'weeks': []})
         global weeks
-        weeks = {}
+        weeks = []
         currentYearPos = len(weeksprcp["years"])-1
 
     element = lineOfData[17:21]
@@ -77,12 +77,26 @@ def addToYear(lineOfData):
             val = int(dayDat[1])
             
             weeknumStr = str("%02d" % (weeknum,))
-            if weeknumStr not in weeks:
-               weeks[weeknumStr] = val
-            elif weeks[weeknumStr] < val:
-                weeks[weeknumStr] = val
+
+            if next((item for item in weeks if item["key"] == weeknumStr),None) is None:
+                newWeek = {"key":weeknumStr, "value":val}
+                weeks.append(newWeek)
+            elif (item for item in weeks if item["key"] == weeknumStr).next()['value'] < val:
+                (item for item in weeks if item["key"] == weeknumStr).next()['value'] = val
+            # elif next((item for item in weeks if item["key"] == weeknumStr),None):
+                # print val
+                # print newWeek
+            # if weeknumStr not in weeks:
+            #    weeks[weeknumStr] = val
+            # elif weeks[weeknumStr] < val:
+            #     weeks[weeknumStr] = val
 
     weeksprcp["years"][currentYearPos]['weeks'] = weeks
+
+
+# def getWeek(weeks):
+
+
 
 
 def initDays():
