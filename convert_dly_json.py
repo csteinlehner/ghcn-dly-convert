@@ -82,7 +82,7 @@ with open(csvfile) as fp:
 
 output = csvfile.split('.')[0]
 with open(output+'.json', 'w') as f:
-    json.dump(days, f, indent=2, sort_keys=True) # readable version
-    # json.dump(days, f, sort_keys=True) # tiny version
+    # json.dump(days, f, indent=2, sort_keys=True) # readable version
+    json.dump(days, f, sort_keys=True) # tiny version
     print 'Json written to '+output+'.json'
 
