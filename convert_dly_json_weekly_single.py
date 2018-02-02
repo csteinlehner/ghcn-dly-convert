@@ -72,7 +72,7 @@ def addToYear(lineOfData):
             weeknum = date.isocalendar()[1]
             if (weeknum == 1 and date.month == 12):
                 weeknum = 54
-            if (weeknum == 52 and date.month == 1):
+            if ((weeknum == 52 or weeknum == 53) and date.month == 1):
                 weeknum = 0
             val = int(dayDat[1])
             
@@ -81,8 +81,8 @@ def addToYear(lineOfData):
             if next((item for item in weeks if item["key"] == weeknumStr),None) is None:
                 newWeek = {"key":weeknumStr, "value":val}
                 weeks.append(newWeek)
-            elif (item for item in weeks if item["key"] == weeknumStr).next()['value'] < val:
-                (item for item in weeks if item["key"] == weeknumStr).next()['value'] = val
+            else:
+                (item for item in weeks if item["key"] == weeknumStr).next()['value'] += val
             # elif next((item for item in weeks if item["key"] == weeknumStr),None):
                 # print val
                 # print newWeek
