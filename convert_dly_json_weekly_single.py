@@ -83,13 +83,6 @@ def addToYear(lineOfData):
                 weeks.append(newWeek)
             else:
                 (item for item in weeks if item["key"] == weeknumStr).next()['value'] += val
-            # elif next((item for item in weeks if item["key"] == weeknumStr),None):
-                # print val
-                # print newWeek
-            # if weeknumStr not in weeks:
-            #    weeks[weeknumStr] = val
-            # elif weeks[weeknumStr] < val:
-            #     weeks[weeknumStr] = val
 
     weeksprcp["years"][currentYearPos]['weeks'] = weeks
 
