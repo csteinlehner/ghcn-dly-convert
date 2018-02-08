@@ -1,6 +1,6 @@
 """ 
 Converts GHCN DLY Data from ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/ to JSON file structured by Year/Month/Day
-Usage python convert_to_json.py stationname.dly
+Usage python convert_to_json_weekly_single.py stationname.dly YYYY-YYYY
 """
 
 
@@ -10,18 +10,18 @@ import datetime
 from calendar import monthrange
 
 
-if len(sys.argv) > 3:
+if len(sys.argv) > 2:
     if sys.argv[1].find('.dly') == -1:
-        print "Please specify a .dly station file, a key and a year Range as YYYY-YYYY"
+        print "Please specify a .dly station file and a year Range as YYYY-YYYY"
         quit()
 else:
-    print "Please specify a .dly station file, a key and a year Range as YYYY-YYYY"
+    print "Please specify a .dly station file and a year Range as YYYY-YYYY"
     quit()
 
 csvfile = sys.argv[1]
-yearInput = map(int, sys.argv[3].split('-'))
+yearInput = map(int, sys.argv[2].split('-'))
 yearInputRange = range(yearInput[0], yearInput[1]+1)
-valKey = sys.argv[2]
+valKey = 'PRCP'
 
 weeksprcp = {}
 weeksprcp["years"] = []
