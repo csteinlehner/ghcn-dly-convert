@@ -37,58 +37,55 @@ def addToYear(lineOfData):
     year = rowData["year"]
     month = rowData["month"]
     date = datetime.datetime(int(year), int(month), 1)
-    
-    # yearStr = str(year)
 
-# 
     currentYearPos = -1
-
-    # Check if this year already in days, if not add it with empty week array
     
-
     element = lineOfData[17:21]
     monthlength = monthrange(int(year), int(month))[1]
 
     weeknum = -1
 
+    # Do for every day
     for x in range(0, monthlength):
         dayOM = x + 1
         offsetStart = (x*8)+21
         offsetEnd = offsetStart + 8
         dayDat = addMeasurement(element, lineOfData[offsetStart:offsetEnd])
 
-        #  Just look at asked Values
+        #  Just look at asked Values (PRCP for example)
         if dayDat[0] == valKey:
             date = datetime.datetime(int(year), int(month), dayOM)
             yearStr = str(date.isocalendar()[0])
-            # print date.strftime("%W")+' - '+date.strftime("%d. %b %Y")
-            # print date.strftime("%a") + ' - ' + str(date) + ' - ' + str(date.isocalendar()) + ' - ' + yearStr
+            
+            # Look if there is already a year for this current day
             if not any(d["key"] == yearStr for d in weeksprcp['years']):
                 weeksprcp["years"].append({'key': yearStr, 'weeks': []})
-                # global weeks
                 weeks = []
 
+            # Save the position of the current year
             for num, yy in enumerate(weeksprcp["years"]):
                 if yy["key"] == yearStr:
                     currentYearPos = num
 
             weeknum = date.isocalendar()[1]
+            weeknumStr = str("%02d" % (weeknum,))
+
+            #  Get the weeks list for the current year
+            weeks = weeksprcp["years"][currentYearPos]['weeks']
 
             val = int(dayDat[1])
 
-            weeknumStr = str("%02d" % (weeknum,))
-            weeks = weeksprcp["years"][currentYearPos]['weeks']
+            # Insert week if it is not there yet
             if next((item for item in weeks if item["key"] == weeknumStr), None) is None:   
                 newWeek = {"key": weeknumStr, "value": val}
                 weeks.append(newWeek)
+            # Add up the week if it is already there
             else:
                 (item for item in weeks if item["key"] == weeknumStr).next()[
                     'value'] += val
-
+            
+            #  Write the weeks list for the current week, this will be done for every day, because between years days of one week can be in different years 
             weeksprcp["years"][currentYearPos]['weeks'] = weeks
-
-
-# def getWeek(weeks):
 
 
 def initDays():
