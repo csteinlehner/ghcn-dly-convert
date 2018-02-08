@@ -3,10 +3,6 @@ Converts GHCN DLY Data from ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/ to JSON
 Usage python convert_to_json.py stationname.dly
 """
 
-"""
-NOTE: Weeks split over a year could be week 0 or 54
-TODO: Cope with weeks split over a year 
-"""
 
 import sys
 import json
@@ -30,7 +26,7 @@ valKey = sys.argv[2]
 weeksprcp = {}
 weeksprcp["years"] = []
 rowData = {}
-weeks = []
+# weeks = []
 
 
 def addMeasurement(measureType, measurement):
@@ -40,63 +36,59 @@ def addMeasurement(measureType, measurement):
 def addToYear(lineOfData):
     year = rowData["year"]
     month = rowData["month"]
-    yearStr = str(year)
-    monthStr = str(month)
-    currentYearPos = -1
-    currentMonthPos = -1
+    date = datetime.datetime(int(year), int(month), 1)
     
+    # yearStr = str(year)
+
+# 
+    currentYearPos = -1
 
     # Check if this year already in days, if not add it with empty week array
-    if not any(d["key"] == yearStr for d in weeksprcp['years']):
-        weeksprcp["years"].append({'key': yearStr, 'weeks': []})
-        global weeks
-        weeks = []
-        currentYearPos = len(weeksprcp["years"])-1
+    
 
     element = lineOfData[17:21]
     monthlength = monthrange(int(year), int(month))[1]
-    
-    currentWeek = -1
+
     weeknum = -1
-    
+
     for x in range(0, monthlength):
         dayOM = x + 1
         offsetStart = (x*8)+21
         offsetEnd = offsetStart + 8
         dayDat = addMeasurement(element, lineOfData[offsetStart:offsetEnd])
-        dayStr = str("%02d" % (dayOM,))
-        #  Just look at PRCP Values
 
+        #  Just look at asked Values
         if dayDat[0] == valKey:
             date = datetime.datetime(int(year), int(month), dayOM)
-            weeknum = date.isocalendar()[1]
-            if (weeknum == 1 and date.month == 12):
-                weeknum = 54
-            if ((weeknum == 52 or weeknum == 53) and date.month == 1):
-                weeknum = 0
-            val = int(dayDat[1])
-            
-            weeknumStr = str("%02d" % (weeknum,))
+            yearStr = str(date.isocalendar()[0])
+            # print date.strftime("%W")+' - '+date.strftime("%d. %b %Y")
+            # print date.strftime("%a") + ' - ' + str(date) + ' - ' + str(date.isocalendar()) + ' - ' + yearStr
+            if not any(d["key"] == yearStr for d in weeksprcp['years']):
+                weeksprcp["years"].append({'key': yearStr, 'weeks': []})
+                # global weeks
+                weeks = []
 
-            if next((item for item in weeks if item["key"] == weeknumStr),None) is None:
-                newWeek = {"key":weeknumStr, "value":val}
+            for num, yy in enumerate(weeksprcp["years"]):
+                if yy["key"] == yearStr:
+                    currentYearPos = num
+
+            weeknum = date.isocalendar()[1]
+
+            val = int(dayDat[1])
+
+            weeknumStr = str("%02d" % (weeknum,))
+            weeks = weeksprcp["years"][currentYearPos]['weeks']
+            if next((item for item in weeks if item["key"] == weeknumStr), None) is None:   
+                newWeek = {"key": weeknumStr, "value": val}
                 weeks.append(newWeek)
             else:
-                (item for item in weeks if item["key"] == weeknumStr).next()['value'] += val
-            # elif next((item for item in weeks if item["key"] == weeknumStr),None):
-                # print val
-                # print newWeek
-            # if weeknumStr not in weeks:
-            #    weeks[weeknumStr] = val
-            # elif weeks[weeknumStr] < val:
-            #     weeks[weeknumStr] = val
+                (item for item in weeks if item["key"] == weeknumStr).next()[
+                    'value'] += val
 
-    weeksprcp["years"][currentYearPos]['weeks'] = weeks
+            weeksprcp["years"][currentYearPos]['weeks'] = weeks
 
 
 # def getWeek(weeks):
-
-
 
 
 def initDays():
@@ -122,6 +114,6 @@ with open(csvfile) as fp:
 
 output = csvfile.split('.')[0]
 with open(output+'-'+valKey+'.json', 'w') as f:
-    json.dump(weeksprcp, f, indent=2, sort_keys=True) # readable version
-    # json.dump(weekprcp, f, sort_keys=True)  # tiny version
+    # json.dump(weeksprcp, f, indent=2, sort_keys=True)  # readable version
+    json.dump(weeksprcp, f, sort_keys=True)  # tiny version
     print 'Json written to '+output+'-'+valKey+'.json'
