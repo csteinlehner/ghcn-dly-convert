@@ -8,4 +8,5 @@ convert_to_json_weekly_single.py converts PRCP given values structured by Year/W
 
 Usage:
 > python convert_to_json.py stationname.dly YYYY-YYYY
+>
 > python convert_to_json_weekly_single.py stationname.dly YYYY-YYYY
